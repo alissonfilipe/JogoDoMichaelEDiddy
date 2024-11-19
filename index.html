@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Michael Jackson Labirinto</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #game {
+            width: 320px;
+            height: 320px;
+            position: relative;
+            background-image: url('https://cdn.pixabay.com/photo/2014/04/03/11/37/bricks-311993_640.png');
+            background-size: 32px 32px;
+            /* Ajuste o tamanho do ladrilho para o tamanho do labirinto */
+            display: grid;
+            grid-template-columns: repeat(10, 32px);
+            grid-template-rows: repeat(10, 32px);
+        }
+
+        #michael {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-image: url('https://cdn.pixabay.com/photo/2022/02/19/11/31/singer-7022384_640.png');
+            background-size: cover;
+            left: 32px;
+            /* Posição inicial do Michael */
+            top: 32px;
+            /* Posição inicial do Michael */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <div id="michael"></div>
+    </div>
+
+    <script>
+        const game = document.getElementById("game");
+        const michael = document.getElementById("michael");
+
+        // Posições do labirinto
+        const maze = [
+            "1111111111",
+            "1000000001",
+            "1011011101",
+            "1010000101",
+            "1010110101",
+            "1010100101",
+            "1010100101",
+            "1010100101",
+            "1010100101",
+            "1111111111"
+        ];
+
+        const tileSize = 32; // Tamanho de cada bloco (tijolo ou caminho)
+        let michaelPos = { x: 1, y: 1 }; // Posição inicial do Michael
+
+        // Função para verificar se a posição desejada é válida
+        function isValidMove(x, y) {
+            if (x < 0 || x >= maze[0].length || y < 0 || y >= maze.length) {
+                return false;
+            }
+            return maze[y][x] === "0"; // Verifica se o bloco é caminho (0)
+        }
+
+        // Atualiza a posição de Michael
+        function updatePosition() {
+            michael.style.left = michaelPos.x * tileSize + "px";
+            michael.style.top = michaelPos.y * tileSize + "px";
+        }
+
+        // Função para mover Michael de acordo com a tecla pressionada
+        function moveMichael(e) {
+            const oldPos = { ...michaelPos };
+
+            switch (e.key) {
+                case "ArrowUp":
+                    if (isValidMove(michaelPos.x, michaelPos.y - 1)) {
+                        michaelPos.y -= 1;
+                    }
+                    break;
+                case "ArrowDown":
+                    if (isValidMove(michaelPos.x, michaelPos.y + 1)) {
+                        michaelPos.y += 1;
+                    }
+                    break;
+                case "ArrowLeft":
+                    if (isValidMove(michaelPos.x - 1, michaelPos.y)) {
+                        michaelPos.x -= 1;
+                    }
+                    break;
+                case "ArrowRight":
+                    if (isValidMove(michaelPos.x + 1, michaelPos.y)) {
+                        michaelPos.x += 1;
+                    }
+                    break;
+            }
+
+            // Atualiza a posição do personagem apenas se mudou
+            if (oldPos.x !== michaelPos.x || oldPos.y !== michaelPos.y) {
+                updatePosition();
+            }
+        }
+
+        // Adiciona o ouvinte para as teclas de movimento
+        window.addEventListener("keydown", moveMichael);
+
+        // Inicializa a posição de Michael
+        updatePosition();
+    </script>
+</body>
+
+</html>
