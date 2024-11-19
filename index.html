@@ -13,6 +13,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
 
         #game {
@@ -23,6 +24,7 @@
             display: grid;
             grid-template-columns: repeat(10, 32px);
             grid-template-rows: repeat(10, 32px);
+            z-index: 1;
         }
 
         #michael {
@@ -49,29 +51,62 @@
             background-image: url('Raper.png');
             background-size: cover;
         }
+
+        #gameOverScreen {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        #gameOverScreen h1 {
+            font-size: 30px;
+        }
+
+        #gameOverScreen button {
+            background-color: #ff5722;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #gameOverScreen button:hover {
+            background-color: #e64a19;
+        }
     </style>
 </head>
 
 <body>
-    <div id="game">
-        <div id="michael"></div>
-        <div id="raper"></div>
+    <div id="game"></div>
+
+    <div id="gameOverScreen">
+        <h1>Diddy lhe pegou!</h1>
+        <button onclick="restartGame()">Tentar de novo</button>
     </div>
 
     <script>
         const game = document.getElementById("game");
-        const michael = document.getElementById("michael");
-        const raper = document.getElementById("raper");
+        const gameOverScreen = document.getElementById("gameOverScreen");
 
         const maze = [
             "1111111111",
             "1000000001",
             "1011011101",
-            "1010000101",
+            "1010000001",
             "1010110101",
             "1010100101",
-            "1010100101",
-            "1010100101",
+            "1000100101",
+            "1010000001",
             "1010100101",
             "1111111111"
         ];
@@ -80,10 +115,14 @@
         let michaelPos = { x: 1, y: 1 };
         let raperPos = { x: 5, y: 5 };
 
+        let michaelElement;
+        let raperElement;
+
         // Função para desenhar o labirinto
         function drawMaze() {
-            game.innerHTML = "";
+            game.innerHTML = ""; // Limpa o conteúdo do jogo
 
+            // Desenha as paredes do labirinto
             for (let y = 0; y < maze.length; y++) {
                 for (let x = 0; x < maze[y].length; x++) {
                     const tile = document.createElement("div");
@@ -92,17 +131,40 @@
                     if (maze[y][x] === "1") {
                         const wall = document.createElement("div");
                         wall.classList.add("wall");
+                        wall.style.position = 'absolute';
+                        wall.style.left = x * tileSize + "px";
+                        wall.style.top = y * tileSize + "px";
                         game.appendChild(wall);
-                    } else {
-                        const path = document.createElement("div");
-                        path.classList.add("tile");
-                        game.appendChild(path);
                     }
                 }
             }
 
-            game.appendChild(michael);
-            game.appendChild(raper);
+            // Cria o personagem Michael se não existir
+            if (!michaelElement) {
+                michaelElement = document.createElement("div");
+                michaelElement.id = "michael";
+                michaelElement.style.position = "absolute";
+                michaelElement.style.width = "32px";
+                michaelElement.style.height = "32px";
+                michaelElement.style.backgroundImage = 'url("https://cdn.pixabay.com/photo/2022/02/19/11/31/singer-7022384_640.png")';
+                michaelElement.style.backgroundSize = "cover";
+                game.appendChild(michaelElement);
+            }
+
+            // Cria o personagem Raper se não existir
+            if (!raperElement) {
+                raperElement = document.createElement("div");
+                raperElement.id = "raper";
+                raperElement.style.position = "absolute";
+                raperElement.style.width = "32px";
+                raperElement.style.height = "32px";
+                raperElement.style.backgroundImage = 'url("Raper.png")';
+                raperElement.style.backgroundSize = "cover";
+                game.appendChild(raperElement);
+            }
+
+            updatePosition();
+            updateRaperPosition();
         }
 
         // Função para verificar se a posição desejada é válida
@@ -113,23 +175,19 @@
             return maze[y][x] === "0";
         }
 
-        // Verifica se a posição está ocupada
-        function isOccupied(x, y) {
-            // Se a posição já estiver ocupada por Michael ou o rapper, retorna true
-            if ((x === michaelPos.x && y === michaelPos.y) || (x === raperPos.x && y === raperPos.y)) {
-                return true;
-            }
-            return false;
+        // Função para verificar se os personagens se tocam
+        function checkCollision() {
+            return (michaelPos.x === raperPos.x && michaelPos.y === raperPos.y);
         }
 
         function updatePosition() {
-            michael.style.left = michaelPos.x * tileSize + "px";
-            michael.style.top = michaelPos.y * tileSize + "px";
+            michaelElement.style.left = michaelPos.x * tileSize + "px";
+            michaelElement.style.top = michaelPos.y * tileSize + "px";
         }
 
         function updateRaperPosition() {
-            raper.style.left = raperPos.x * tileSize + "px";
-            raper.style.top = raperPos.y * tileSize + "px";
+            raperElement.style.left = raperPos.x * tileSize + "px";
+            raperElement.style.top = raperPos.y * tileSize + "px";
         }
 
         function moveMichael(e) {
@@ -137,22 +195,22 @@
 
             switch (e.key) {
                 case "ArrowUp":
-                    if (isValidMove(michaelPos.x, michaelPos.y - 1) && !isOccupied(michaelPos.x, michaelPos.y - 1)) {
+                    if (isValidMove(michaelPos.x, michaelPos.y - 1)) {
                         michaelPos.y -= 1;
                     }
                     break;
                 case "ArrowDown":
-                    if (isValidMove(michaelPos.x, michaelPos.y + 1) && !isOccupied(michaelPos.x, michaelPos.y + 1)) {
+                    if (isValidMove(michaelPos.x, michaelPos.y + 1)) {
                         michaelPos.y += 1;
                     }
                     break;
                 case "ArrowLeft":
-                    if (isValidMove(michaelPos.x - 1, michaelPos.y) && !isOccupied(michaelPos.x - 1, michaelPos.y)) {
+                    if (isValidMove(michaelPos.x - 1, michaelPos.y)) {
                         michaelPos.x -= 1;
                     }
                     break;
                 case "ArrowRight":
-                    if (isValidMove(michaelPos.x + 1, michaelPos.y) && !isOccupied(michaelPos.x + 1, michaelPos.y)) {
+                    if (isValidMove(michaelPos.x + 1, michaelPos.y)) {
                         michaelPos.x += 1;
                     }
                     break;
@@ -160,6 +218,10 @@
 
             if (oldPos.x !== michaelPos.x || oldPos.y !== michaelPos.y) {
                 updatePosition();
+            }
+
+            if (checkCollision()) {
+                gameOver();
             }
         }
 
@@ -175,20 +237,32 @@
             const newRaperPosX = raperPos.x + randomDirection.dx;
             const newRaperPosY = raperPos.y + randomDirection.dy;
 
-            if (isValidMove(newRaperPosX, newRaperPosY) && !isOccupied(newRaperPosX, newRaperPosY)) {
+            if (isValidMove(newRaperPosX, newRaperPosY)) {
                 raperPos.x = newRaperPosX;
                 raperPos.y = newRaperPosY;
                 updateRaperPosition();
             }
+
+            if (checkCollision()) {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            gameOverScreen.style.display = "block";
+            game.style.display = "none";
+        }
+
+        // A função de reiniciar agora apenas recarrega a página
+        function restartGame() {
+            location.reload(); // Isso vai recarregar a página
         }
 
         window.addEventListener("keydown", moveMichael);
 
-        drawMaze();
-        updatePosition();
-        updateRaperPosition();
-
         setInterval(moveRaperRandomly, 1000);
+
+        drawMaze();
     </script>
 </body>
 

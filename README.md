@@ -6,3 +6,7 @@ fiz esse projeto apenas para diversão e para testar alguas coisas
 ![alt text](versões/version1.png)
 ![alt text](versões/version2.png)
 ![alt text](versões/version3.png)
+
+
+# depois da colisão com o diidy
+![alt text](image-1.png)
