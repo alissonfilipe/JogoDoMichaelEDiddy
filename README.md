@@ -8,5 +8,5 @@ fiz esse projeto apenas para diversão e para testar alguas coisas
 ![alt text](versões/version3.png)
 
 
-# depois da colisão com o diidy
+# depois da colisão com o diddy
 ![alt text](image-1.png)
