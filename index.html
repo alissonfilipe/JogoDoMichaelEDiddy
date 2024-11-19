@@ -20,7 +20,6 @@
             height: 320px;
             position: relative;
             background-color: #fff;
-            /* Fundo branco do quadrado */
             display: grid;
             grid-template-columns: repeat(10, 32px);
             grid-template-rows: repeat(10, 32px);
@@ -33,9 +32,7 @@
             background-image: url('https://cdn.pixabay.com/photo/2022/02/19/11/31/singer-7022384_640.png');
             background-size: cover;
             left: 32px;
-            /* Posição inicial de Michael */
             top: 32px;
-            /* Posição inicial de Michael */
         }
 
         .wall {
@@ -50,7 +47,6 @@
             width: 32px;
             height: 32px;
             background-image: url('Raper.png');
-            /* Caminho para sua imagem */
             background-size: cover;
         }
     </style>
@@ -59,7 +55,7 @@
 <body>
     <div id="game">
         <div id="michael"></div>
-        <div id="raper"></div> <!-- Adicionando a imagem do rapper -->
+        <div id="raper"></div>
     </div>
 
     <script>
@@ -67,7 +63,6 @@
         const michael = document.getElementById("michael");
         const raper = document.getElementById("raper");
 
-        // Posições do labirinto (1 para tijolo, 0 para caminho)
         const maze = [
             "1111111111",
             "1000000001",
@@ -81,26 +76,24 @@
             "1111111111"
         ];
 
-        const tileSize = 32; // Tamanho de cada bloco (tijolo ou caminho)
-        let michaelPos = { x: 1, y: 1 }; // Posição inicial de Michael
-        let raperPos = { x: 5, y: 5 }; // Nova posição inicial do rapper (ex: na coordenada (5,5))
+        const tileSize = 32;
+        let michaelPos = { x: 1, y: 1 };
+        let raperPos = { x: 5, y: 5 };
 
         // Função para desenhar o labirinto
         function drawMaze() {
-            game.innerHTML = ""; // Limpa o jogo antes de redesenhar
+            game.innerHTML = "";
 
             for (let y = 0; y < maze.length; y++) {
                 for (let x = 0; x < maze[y].length; x++) {
                     const tile = document.createElement("div");
                     tile.classList.add("tile");
 
-                    // Se for parede (1), renderiza o tijolo
                     if (maze[y][x] === "1") {
                         const wall = document.createElement("div");
                         wall.classList.add("wall");
                         game.appendChild(wall);
                     } else {
-                        // Se for caminho (0), deixa em branco (caminho livre)
                         const path = document.createElement("div");
                         path.classList.add("tile");
                         game.appendChild(path);
@@ -108,9 +101,8 @@
                 }
             }
 
-            // Depois de desenhar o labirinto, desenha o personagem
             game.appendChild(michael);
-            game.appendChild(raper); // Adiciona a imagem do rapper
+            game.appendChild(raper);
         }
 
         // Função para verificar se a posição desejada é válida
@@ -118,84 +110,84 @@
             if (x < 0 || x >= maze[0].length || y < 0 || y >= maze.length) {
                 return false;
             }
-            return maze[y][x] === "0"; // Verifica se o bloco é caminho (0)
+            return maze[y][x] === "0";
         }
 
-        // Atualiza a posição de Michael
+        // Verifica se a posição está ocupada
+        function isOccupied(x, y) {
+            // Se a posição já estiver ocupada por Michael ou o rapper, retorna true
+            if ((x === michaelPos.x && y === michaelPos.y) || (x === raperPos.x && y === raperPos.y)) {
+                return true;
+            }
+            return false;
+        }
+
         function updatePosition() {
             michael.style.left = michaelPos.x * tileSize + "px";
             michael.style.top = michaelPos.y * tileSize + "px";
         }
 
-        // Atualiza a posição do rapper
         function updateRaperPosition() {
             raper.style.left = raperPos.x * tileSize + "px";
             raper.style.top = raperPos.y * tileSize + "px";
         }
 
-        // Função para mover Michael de acordo com a tecla pressionada
         function moveMichael(e) {
             const oldPos = { ...michaelPos };
 
             switch (e.key) {
                 case "ArrowUp":
-                    if (isValidMove(michaelPos.x, michaelPos.y - 1)) {
+                    if (isValidMove(michaelPos.x, michaelPos.y - 1) && !isOccupied(michaelPos.x, michaelPos.y - 1)) {
                         michaelPos.y -= 1;
                     }
                     break;
                 case "ArrowDown":
-                    if (isValidMove(michaelPos.x, michaelPos.y + 1)) {
+                    if (isValidMove(michaelPos.x, michaelPos.y + 1) && !isOccupied(michaelPos.x, michaelPos.y + 1)) {
                         michaelPos.y += 1;
                     }
                     break;
                 case "ArrowLeft":
-                    if (isValidMove(michaelPos.x - 1, michaelPos.y)) {
+                    if (isValidMove(michaelPos.x - 1, michaelPos.y) && !isOccupied(michaelPos.x - 1, michaelPos.y)) {
                         michaelPos.x -= 1;
                     }
                     break;
                 case "ArrowRight":
-                    if (isValidMove(michaelPos.x + 1, michaelPos.y)) {
+                    if (isValidMove(michaelPos.x + 1, michaelPos.y) && !isOccupied(michaelPos.x + 1, michaelPos.y)) {
                         michaelPos.x += 1;
                     }
                     break;
             }
 
-            // Atualiza a posição do personagem apenas se mudou
             if (oldPos.x !== michaelPos.x || oldPos.y !== michaelPos.y) {
                 updatePosition();
             }
         }
 
-        // Função para mover o rapper aleatoriamente
         function moveRaperRandomly() {
             const directions = [
-                { dx: 0, dy: -1 }, // Cima
-                { dx: 0, dy: 1 },  // Baixo
-                { dx: -1, dy: 0 }, // Esquerda
-                { dx: 1, dy: 0 }   // Direita
+                { dx: 0, dy: -1 },
+                { dx: 0, dy: 1 },
+                { dx: -1, dy: 0 },
+                { dx: 1, dy: 0 }
             ];
 
             const randomDirection = directions[Math.floor(Math.random() * directions.length)];
             const newRaperPosX = raperPos.x + randomDirection.dx;
             const newRaperPosY = raperPos.y + randomDirection.dy;
 
-            // Verifica se a nova posição do rapper é válida
-            if (isValidMove(newRaperPosX, newRaperPosY)) {
+            if (isValidMove(newRaperPosX, newRaperPosY) && !isOccupied(newRaperPosX, newRaperPosY)) {
                 raperPos.x = newRaperPosX;
                 raperPos.y = newRaperPosY;
                 updateRaperPosition();
             }
         }
 
-        // Adiciona o ouvinte para as teclas de movimento
         window.addEventListener("keydown", moveMichael);
 
-        // Inicializa o jogo
         drawMaze();
         updatePosition();
         updateRaperPosition();
 
-        // Move o rapper a cada 1 segundo
         setInterval(moveRaperRandomly, 1000);
     </script>
 </body>
