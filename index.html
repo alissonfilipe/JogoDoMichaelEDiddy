@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo Michael Jackson Labirinto</title>
+    <title>Michael no Labirinto</title>
     <style>
         body {
             display: flex;
@@ -19,9 +19,8 @@
             width: 320px;
             height: 320px;
             position: relative;
-            background-image: url('https://cdn.pixabay.com/photo/2014/04/03/11/37/bricks-311993_640.png');
-            background-size: 32px 32px;
-            /* Ajuste o tamanho do ladrilho para o tamanho do labirinto */
+            background-color: #fff;
+            /* Fundo branco do quadrado */
             display: grid;
             grid-template-columns: repeat(10, 32px);
             grid-template-rows: repeat(10, 32px);
@@ -34,9 +33,16 @@
             background-image: url('https://cdn.pixabay.com/photo/2022/02/19/11/31/singer-7022384_640.png');
             background-size: cover;
             left: 32px;
-            /* Posição inicial do Michael */
+            /* Posição inicial de Michael */
             top: 32px;
-            /* Posição inicial do Michael */
+            /* Posição inicial de Michael */
+        }
+
+        .wall {
+            background-image: url('https://cdn.pixabay.com/photo/2014/04/03/11/37/bricks-311993_640.png');
+            background-size: cover;
+            width: 32px;
+            height: 32px;
         }
     </style>
 </head>
@@ -50,7 +56,7 @@
         const game = document.getElementById("game");
         const michael = document.getElementById("michael");
 
-        // Posições do labirinto
+        // Posições do labirinto (1 para tijolo, 0 para caminho)
         const maze = [
             "1111111111",
             "1000000001",
@@ -66,6 +72,33 @@
 
         const tileSize = 32; // Tamanho de cada bloco (tijolo ou caminho)
         let michaelPos = { x: 1, y: 1 }; // Posição inicial do Michael
+
+        // Função para desenhar o labirinto
+        function drawMaze() {
+            game.innerHTML = ""; // Limpa o jogo antes de redesenhar
+
+            for (let y = 0; y < maze.length; y++) {
+                for (let x = 0; x < maze[y].length; x++) {
+                    const tile = document.createElement("div");
+                    tile.classList.add("tile");
+
+                    // Se for parede (1), renderiza o tijolo
+                    if (maze[y][x] === "1") {
+                        const wall = document.createElement("div");
+                        wall.classList.add("wall");
+                        game.appendChild(wall);
+                    } else {
+                        // Se for caminho (0), deixa em branco (caminho livre)
+                        const path = document.createElement("div");
+                        path.classList.add("tile");
+                        game.appendChild(path);
+                    }
+                }
+            }
+
+            // Depois de desenhar o labirinto, desenha o personagem
+            game.appendChild(michael);
+        }
 
         // Função para verificar se a posição desejada é válida
         function isValidMove(x, y) {
@@ -117,7 +150,8 @@
         // Adiciona o ouvinte para as teclas de movimento
         window.addEventListener("keydown", moveMichael);
 
-        // Inicializa a posição de Michael
+        // Inicializa o jogo
+        drawMaze();
         updatePosition();
     </script>
 </body>
